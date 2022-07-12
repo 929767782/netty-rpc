@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * 配置类，加载配置文件中的序列化方式和服务器端口号等重要属性
+ */
 public abstract class Config {
     static Properties properties;
     static {
