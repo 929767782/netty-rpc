@@ -1,37 +1,36 @@
 package factory;
 
-import config.Config;
 
-import java.io.IOException;
-import java.io.InputStream;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
+/**
+ * 提供服务的工厂  给定接口名，提供具体的调用对象
+ *
+ * @author llp
+ */
+@Slf4j
 public class ServiceFactory {
 
-    static Properties properties;
-    static Map<Class<?>, Object> map = new ConcurrentHashMap<>();
+    //保存所有有注解@RpcService的集合
+    static final Map<String, Object> serviceFactory = new ConcurrentHashMap<>();
 
-    static {
-        try (InputStream in = Config.class.getResourceAsStream("/application.properties")) {
-            properties = new Properties();
-            properties.load(in);
-            Set<String> names = properties.stringPropertyNames();
-            for (String name : names) {
-                if (name.endsWith("Service")) {
-                    Class<?> interfaceClass = Class.forName(name);
-                    Class<?> instanceClass = Class.forName(properties.getProperty(name));
-                    map.put(interfaceClass, instanceClass.newInstance());
-                }
-            }
-        } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            throw new ExceptionInInitializerError(e);
+    //添加已注解的类进入工厂
+    public <T> void addServiceProvider(T service, String serviceName) {
+        if (serviceFactory.containsKey(serviceName)) {
+            return;
         }
+        serviceFactory.put(serviceName, service);
+        log.debug("服务类{}添加进工厂",serviceName);
     }
 
-    public static <T> T getService(Class<T> interfaceClass) {
-        return (T) map.get(interfaceClass);
+    //远程调用接口的实例从该方法获取
+    public Object getServiceProvider(String serviceName) {
+        Object service = serviceFactory.get(serviceName);
+        if (service == null) {
+            throw new RuntimeException("未发现该服务");
+        }
+        return service;
     }
 }
