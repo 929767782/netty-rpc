@@ -36,4 +36,19 @@ public abstract class Config {
             return Algorithm.valueOf(algorithm);
         }
     }
+
+    public static String getZookeeperAddress(){
+        String address = properties.getProperty("zookeeper.address");
+        return address;
+    }
+
+    public static String getZookeeperSessionTimeout(){
+        return properties.getProperty("zookeeper.session_timeout");
+    }
+    public static String getZookeeperRegistryPath(){
+        return properties.getProperty("zookeeper.registry_path");
+    }
+    public static String getZookeeperNameSpace(){
+        return properties.getProperty("zookeeper.name_space");
+    }
 }
