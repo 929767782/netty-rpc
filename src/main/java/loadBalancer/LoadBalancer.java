@@ -1,7 +1,6 @@
 package loadBalancer;
 
-import com.alibaba.nacos.api.naming.pojo.Instance;
-
+import java.net.InetSocketAddress;
 import java.util.List;
 
 /**
@@ -11,6 +10,6 @@ import java.util.List;
  */
 public interface LoadBalancer {
 
-    Instance getInstance(List<Instance> list);
+    InetSocketAddress getInstance(List<InetSocketAddress> list);
 
 }

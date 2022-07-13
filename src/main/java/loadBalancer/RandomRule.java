@@ -1,7 +1,6 @@
 package loadBalancer;
 
-import com.alibaba.nacos.api.naming.pojo.Instance;
-
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Random;
 
@@ -19,7 +18,7 @@ public class RandomRule implements LoadBalancer{
      * @return
      */
     @Override
-    public Instance getInstance(List<Instance> list) {
+    public InetSocketAddress getInstance(List<InetSocketAddress> list) {
         return list.get(random.nextInt(list.size()));
     }
 }

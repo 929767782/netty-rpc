@@ -1,7 +1,6 @@
 package loadBalancer;
 
-import com.alibaba.nacos.api.naming.pojo.Instance;
-
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,7 +35,7 @@ public class RoundRobinRule implements LoadBalancer {
      * @return
      */
     @Override
-    public Instance getInstance(List<Instance> list) {
+    public InetSocketAddress getInstance(List<InetSocketAddress> list) {
         int index = getAndIncrement() % list.size();
         return list.get(index);
     }
