@@ -127,9 +127,11 @@ public class RpcServerManager {
                     System.err.println("创建对象" + c + "发生错误");
                     continue;
                 }
-                //注解的值如果为空，使用类名
+                //注解的值如果为空，使用类实现的接口名
                 if ("".equals(ServerNameValue)) {
-                    addServer(object,c.getCanonicalName());
+                    String[] packageAndInterfaceName = c.getInterfaces()[0].getName().split("\\.");
+                    String interfaceName = packageAndInterfaceName[packageAndInterfaceName.length-1];
+                    addServer(object,interfaceName);
                 } else {
                     addServer(object, ServerNameValue);
                 }

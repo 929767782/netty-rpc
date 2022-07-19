@@ -23,14 +23,16 @@ public class ClientProxy {
     //JDK动态代理创建代理类
     public  <T> T getProxyService(Class<T> serviceClass) {
         ClassLoader loader = serviceClass.getClassLoader();
-        Class<?>[] interfaces = serviceClass.getInterfaces();
+        Class<?>[] interfaces = new Class[]{serviceClass};
+        String[] packageAndInterfaceName = serviceClass.getName().split("\\.");
+        String interfaceName = packageAndInterfaceName[packageAndInterfaceName.length-1];
         //创建代理对象
         Object o = Proxy.newProxyInstance(loader, interfaces, (proxy, method, args) -> {
             // 1. 将方法调用转换为 消息对象
             int sequenceId = SequenceIdGenerator.nextId();
             RpcRequestMessage msg = new RpcRequestMessage(
                     sequenceId,
-                    serviceClass.getName(),
+                    interfaceName,
                     method.getName(),
                     method.getReturnType(),
                     method.getParameterTypes(),
