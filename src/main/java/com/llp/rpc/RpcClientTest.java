@@ -8,7 +8,7 @@ import com.llp.rpc.service.HelloServiceImpl;
 /**
  * 客户端测试
  *
- * @author chenlei
+ * @author llp
  */
 public class RpcClientTest {
     public static void main(String[] args) {

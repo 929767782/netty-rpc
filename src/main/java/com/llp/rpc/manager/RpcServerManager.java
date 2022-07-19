@@ -4,20 +4,23 @@ import com.llp.rpc.annotation.RpcServer;
 import com.llp.rpc.annotation.RpcServerScan;
 import com.llp.rpc.config.Config;
 import com.llp.rpc.factory.ServiceFactory;
+import com.llp.rpc.nettyHandler.HeartBeatServerHandler;
+import com.llp.rpc.nettyHandler.RpcRequestMessageHandler;
+import com.llp.rpc.protocol.MessageCodec;
+import com.llp.rpc.protocol.ProtocolFrameDecoder;
+import com.llp.rpc.registry.ZkServiceRegistry;
+import com.llp.rpc.utils.PackageScanUtils;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import com.llp.rpc.nettyHandler.RpcRequestMessageHandler;
-import com.llp.rpc.protocol.MessageCodec;
-import com.llp.rpc.protocol.ProtocolFrameDecoder;
-import com.llp.rpc.registry.ZkServiceRegistry;
-import com.llp.rpc.utils.PackageScanUtils;
+import io.netty.handler.timeout.IdleStateHandler;
 
 import java.net.InetSocketAddress;
 import java.util.Set;
@@ -55,9 +58,15 @@ public class RpcServerManager {
         MessageCodec MESSAGE_CODEC = new MessageCodec();
         //RPC请求处理器
         RpcRequestMessageHandler RPC_HANDLER = new RpcRequestMessageHandler();
+        //心跳处理器
+        HeartBeatServerHandler HEATBEAT_SERVER = new HeartBeatServerHandler();
+
         try {
             bootstrap.group(boss, worker)
                     .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 256)//全连接队列的大小
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .option(ChannelOption.TCP_NODELAY, true)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
@@ -65,6 +74,8 @@ public class RpcServerManager {
                             pipeline.addLast(new ProtocolFrameDecoder());//定长解码器
                             pipeline.addLast(MESSAGE_CODEC);
                             pipeline.addLast(LOGGING);
+                            pipeline.addLast(new IdleStateHandler(10, 0, 0));
+                            pipeline.addLast(HEATBEAT_SERVER);
                             pipeline.addLast(RPC_HANDLER);
                         }
                     });

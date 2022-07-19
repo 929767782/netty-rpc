@@ -1,6 +1,13 @@
 package com.llp.rpc.manager;
 
 import com.llp.rpc.config.Config;
+import com.llp.rpc.loadBalancer.RoundRobinRule;
+import com.llp.rpc.message.RpcRequestMessage;
+import com.llp.rpc.nettyHandler.HeartBeatClientHandler;
+import com.llp.rpc.nettyHandler.RpcResponseMessageHandler;
+import com.llp.rpc.protocol.MessageCodec;
+import com.llp.rpc.protocol.ProtocolFrameDecoder;
+import com.llp.rpc.registry.ZkServiceDiscovery;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -11,16 +18,11 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
-import com.llp.rpc.loadBalancer.RoundRobinRule;
 import lombok.extern.slf4j.Slf4j;
-import com.llp.rpc.message.RpcRequestMessage;
-import com.llp.rpc.nettyHandler.RpcResponseMessageHandler;
-import com.llp.rpc.protocol.MessageCodec;
-import com.llp.rpc.protocol.ProtocolFrameDecoder;
-import com.llp.rpc.registry.ZkServiceDiscovery;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -98,6 +100,8 @@ public class RpcClientManager {
         MessageCodec MESSAGE_CODEC = new MessageCodec();
         //处理相应handler
         RpcResponseMessageHandler RPC_HANDLER = new RpcResponseMessageHandler();
+        //心跳处理器
+        HeartBeatClientHandler HEATBEAT_CLIENT = new HeartBeatClientHandler();
 
         bootstrap.channel(NioSocketChannel.class)
                 .group(group)
@@ -109,6 +113,8 @@ public class RpcClientManager {
                         ch.pipeline().addLast(new ProtocolFrameDecoder());
                         ch.pipeline().addLast(MESSAGE_CODEC);
                         ch.pipeline().addLast(LOGGING_HANDLER);
+                        ch.pipeline().addLast(new IdleStateHandler(0, 7, 0));
+                        ch.pipeline().addLast(HEATBEAT_CLIENT);
                         ch.pipeline().addLast(RPC_HANDLER);
                     }
                 });

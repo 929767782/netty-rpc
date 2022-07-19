@@ -40,34 +40,14 @@ public class RpcRequestMessageHandler extends SimpleChannelInboundHandler<RpcReq
             result = method.invoke(service, message.getParameterValue());
             //设置返回值
             responseMessage.setReturnValue(result);
-            System.out.println(result);
         } catch (Exception e) {
             e.printStackTrace();
             responseMessage.setExceptionValue(new Exception("远程调用出错:"+e.getMessage()));
         }finally {
-            System.out.println(responseMessage);
             ctx.writeAndFlush(responseMessage);
             //ReferenceCountUtil.release()其实是ByteBuf.release()方法
             //ReferenceCountUtil.release(com.llp.rpc.annotation.message);
         }
     }
 
-//    /**
-//     * 读空闲
-//     * @param ctx
-//     * @param evt
-//     * @throws Exception
-//     */
-//    @Override
-//    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-//        if (evt instanceof IdleStateEvent) {
-//            IdleState state = ((IdleStateEvent) evt).state();
-//            if (state == IdleState.READER_IDLE) {
-//                log.info("长时间未收到心跳包，断开连接...");
-//                ctx.close();
-//            }
-//        } else {
-//            super.userEventTriggered(ctx, evt);
-//        }
-//    }
 }
