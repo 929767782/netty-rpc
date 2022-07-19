@@ -24,7 +24,7 @@
     </appender>-->
 
     <!-- 用来控制查看那个类的日志内容（对mybatis name 代表命名空间） -->
-    <logger name="com.llp.rpc.service" level="DEBUG" additivity="false">
+    <logger name="com.llp.rpc.server" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
