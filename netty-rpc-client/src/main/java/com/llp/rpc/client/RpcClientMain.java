@@ -15,5 +15,11 @@ public class RpcClientMain {
         //创建代理对象
         HelloService service = new ClientProxy(clientManager).getProxyService(HelloService.class);
         System.out.println(service.sayHello());
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(service.sayHello());
     }
 }
