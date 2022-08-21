@@ -16,9 +16,10 @@ import java.util.jar.JarFile;
  * 扫描路径下所有的文件名工具类
  */
 public class PackageScanUtils {
-    //获取main方法中
+    //获取main方法所在的类的全限定类名
     public static String getStackTrace() {
-        StackTraceElement[] stack = new Throwable().getStackTrace();
+        //获取当前线程运行的栈信息（方法的调用链，数组的最某端就是最开始的main方法）
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
         return stack[stack.length - 1].getClassName();
     }
 
@@ -140,7 +141,7 @@ public class PackageScanUtils {
                     // 添加到集合中去
                     //classes.add(Class.forName(packageName + '.' + className));
                     //经过回复同学的提醒，这里用forName有一些不好，会触发static方法，没有使用classLoader的load干净
-                    classes.add(Thread.currentThread().getContextClassLoader().loadClass(packageName + '.' + className));
+                        classes.add(Thread.currentThread().getContextClassLoader().loadClass(packageName + '.' + className));
                 } catch (ClassNotFoundException e) {
                     // log.error("添加用户自定义视图类错误 找不到此类的.class文件");
                     e.printStackTrace();

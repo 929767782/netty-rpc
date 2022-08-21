@@ -11,5 +11,5 @@ import java.util.List;
 public interface LoadBalancer {
 
     InetSocketAddress getInstance(List<InetSocketAddress> list);
-
+    InetSocketAddress getInstance(List<InetSocketAddress> list,String local);
 }

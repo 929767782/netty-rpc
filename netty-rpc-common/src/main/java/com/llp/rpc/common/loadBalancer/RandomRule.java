@@ -21,4 +21,9 @@ public class RandomRule implements LoadBalancer{
     public InetSocketAddress getInstance(List<InetSocketAddress> list) {
         return list.get(random.nextInt(list.size()));
     }
+
+    @Override
+    public InetSocketAddress getInstance(List<InetSocketAddress> list, String local) {
+        return list.get(random.nextInt(list.size()));
+    }
 }

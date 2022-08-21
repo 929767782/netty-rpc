@@ -12,7 +12,6 @@
         <module>netty-rpc-server</module>
         <module>netty-rpc-client</module>
         <module>netty-rpc-common</module>
-        <module>netty-rpc-test</module>
     </modules>
     <properties>
         <netty.version>4.1.39.Final</netty.version>

@@ -2,11 +2,13 @@ package com.llp.rpc.client.discovery;
 
 
 import com.llp.rpc.common.config.Config;
+import com.llp.rpc.common.loadBalancer.ConsistentHashRule;
 import com.llp.rpc.common.loadBalancer.LoadBalancer;
 import com.llp.rpc.common.loadBalancer.RoundRobinRule;
 import com.llp.rpc.common.zookeeper.CuratorClient;
 import org.apache.zookeeper.KeeperException;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +41,12 @@ public class ZkServiceDiscovery implements ServiceDiscovery{
     public InetSocketAddress getService(String serviceName){
         try {
             byte[] data = curatorClient.getData(Config.getZookeeperRegistryPath()+"/"+serviceName);
-
+//            curatorClient.watchNode(Config.getZookeeperRegistryPath() + "/" + serviceName, new Watcher() {
+//                @Override
+//                public void process(WatchedEvent watchedEvent) {
+//
+//                }
+//            });
             String allAddress = new String(data);
             List<InetSocketAddress> socketAddresses = new ArrayList<>();
             for(String address : allAddress.split("#")){
@@ -47,7 +54,11 @@ public class ZkServiceDiscovery implements ServiceDiscovery{
                 InetSocketAddress socketAddress = new InetSocketAddress(hostAndPort[0],Integer.parseInt(hostAndPort[1]));
                 socketAddresses.add(socketAddress);
             }
-            return loadBalancer.getInstance(socketAddresses);
+            if(loadBalancer instanceof ConsistentHashRule){
+                return loadBalancer.getInstance(socketAddresses, InetAddress.getLocalHost().getHostAddress());
+            }else{
+                return loadBalancer.getInstance(socketAddresses);
+            }
         } catch (KeeperException.NoNodeException e){
             throw new RuntimeException("找不到对应服务");
         } catch (Exception e) {

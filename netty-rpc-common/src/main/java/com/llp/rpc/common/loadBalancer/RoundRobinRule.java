@@ -39,4 +39,10 @@ public class RoundRobinRule implements LoadBalancer {
         int index = getAndIncrement() % list.size();
         return list.get(index);
     }
+
+    @Override
+    public InetSocketAddress getInstance(List<InetSocketAddress> list, String local) {
+        int index = getAndIncrement() % list.size();
+        return list.get(index);
+    }
 }
