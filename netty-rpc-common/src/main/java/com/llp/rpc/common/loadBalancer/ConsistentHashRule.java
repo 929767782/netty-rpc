@@ -8,7 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-
+/**
+ * 一致性hash均衡均衡算法
+ *
+ * @author llp
+ */
 public class ConsistentHashRule implements LoadBalancer {
 
     private final static String VIRTUAL_NODE_SPLIT = "#";
